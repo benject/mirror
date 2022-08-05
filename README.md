@@ -5,4 +5,5 @@ Mirror : a maya facial capture animation toolkit based on mediapipe
 1.install mediapipe 
 
 python -m venv mirror_venv
+
 python -m pip install mediapipe
