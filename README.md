@@ -8,5 +8,5 @@ python -m pip install mediapipe
 
 2.install cv2
 
-python -m pip install cv2
+python -m pip install opencv-python
 
