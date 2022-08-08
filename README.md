@@ -10,3 +10,7 @@ python -m pip install mediapipe
 
 python -m pip install opencv-python
 
+3.drag and drop the src/capture_to_mesh.py to maya
+
+4.follow the instructions to get this script to work
+
