@@ -6,6 +6,7 @@
 import maya.cmds as cmds
 import json
 import os ,sys
+import subprocess
 
 import PySide2.QtCore as QtCore
 from PySide2.QtWidgets import QFileDialog
@@ -40,21 +41,36 @@ class GUI():
 
         self.json_file = ''
         self.root_path = root_path
-        self.ui_file = QtCore.QFile( os.path.join(self.root_path,"ui\FaceCapture_ui.ui")) # 实例化 QFILE 对象
+
+
+
+        self.ui_file = QtCore.QFile( os.path.join(self.root_path,r"ui\FaceCapture_ui.ui")) # 实例化 QFILE 对象
         self.ui_file.open(QtCore.QFile.ReadOnly) #打开ui_file
 
         loader = QUiLoader() #QUIloader 对象
         self.window = loader.load(self.ui_file) # 用QuiLoader对象读取ui_file
 
+        self.ref_file = os.path.abspath(os.path.join(self.root_path,r"scene\facemesh.mb"))
+
+        self.window.lineEdit_2.setText(self.ref_file)
+
         self.display_maya_fps(self.get_maya_fps())
 
-        self.window.pushButton.clicked.connect(self.select_file) #将clicked信号连接到 选择文件 槽函数。 函数名作为参数 不带括号
+        self.window.pushButton_4.clicked.connect(self.select_video_file) #将clicked信号连接到 选择视频文件 槽函数。 函数名作为参数 不带括号
+
+        self.window.pushButton_3.clicked.connect(self.ref_scene_file) #将clicked信号连接到 参考文件 槽函数。 函数名作为参数 不带括号
+
+        self.window.pushButton.clicked.connect(self.select_anim_file) #将clicked信号连接到 选择文件 槽函数。 函数名作为参数 不带括号
 
         #self.window.pushButton_2.clicked.connect(lambda: self.display_maya_fps(self.get_maya_fps())) #pyside 如果需要传参数 用 lamda表达式
         self.window.pushButton_2.clicked.connect(self.process)
 
 
         self.window.show()
+
+    def ref_scene_file(self):
+
+        cmds.file(self.ref_file, r=True)
 
     def display_maya_fps(self,val):
 
@@ -77,7 +93,24 @@ class GUI():
 
         return self.fps_maya
 
-    def select_file(self):
+    def select_video_file(self):
+        '''
+        选择video文件
+        '''
+
+        dlg = QFileDialog()
+
+        self.video_file = dlg.getOpenFileName()[0] #返回的是元组 获得video
+
+        self.window.lineEdit_3.setText(self.video_file)
+
+        p = subprocess.Popen(['py', '-3', os.path.abspath(os.path.join(self.root_path,r'src\face_capture.py')), '-v',self.video_file])
+
+        print("processing video capture" , self.video_file)
+
+
+
+    def select_anim_file(self):
         
         '''
         选择json文件
@@ -86,14 +119,11 @@ class GUI():
         dlg = QFileDialog()
         
 
-        self.json_file = dlg.getOpenFileName()[0] #返回的是元组 获得video
+        self.json_file = dlg.getOpenFileName()[0] #返回的是元组 获得json
 
         self.window.lineEdit.setText(self.json_file)
 
-
-
-        print(self.json_file)
-        
+        #print(self.json_file)        
         
         file = open(self.json_file,"r")
         datas = json.load(file) #datas的数据结构为 [ {frame:%d,sx:%f,jnt_pos:[%f,%f,%f]},{...} ]
