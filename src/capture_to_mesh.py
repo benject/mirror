@@ -70,7 +70,14 @@ class GUI():
 
     def ref_scene_file(self):
 
-        cmds.file(self.ref_file, r=True)
+        cmds.file(self.ref_file, r=True, mergeNamespacesOnClash=False, namespace='facemesh')
+        cmds.select("facemesh:root",r=True,hi=True)
+        self.jnt_arr = cmds.ls(sl=True)[1:]
+        for joint in self.jnt_arr:
+            cmds.setKeyframe( joint + ".tx")
+            cmds.setKeyframe( joint + ".ty")
+            cmds.setKeyframe( joint + ".tz")
+    
 
     def display_maya_fps(self,val):
 
